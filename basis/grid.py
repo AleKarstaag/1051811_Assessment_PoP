@@ -86,8 +86,16 @@ class SqGrid:
         return np.sum(I)/np.size(I)*self.mesh[1][-1,0]
     
     def quadrature(self,k,n,f):
-        """Gauss-Legendre approximation of the integral
-           over the domain of definition of """
+        """Gauss-Legendre approximation (n degree) of the integral of
+           the k-th piecewise continuos linear function times 
+           an arbitrary function f over the whole domain of the problem.
+
+           In short: 
+           The method approximates:
+
+                    ( phi_ij(x,y) , f(x,y) ) 
+                    
+                    """
         a,b=self.mesh[0][0,0],self.mesh[0][0,-1]
         c,d=self.mesh[1][0,0],self.mesh[1][-1,0]
         phi=lambda x,y: finite_basis(x,y,self.nodes[k],self.h)
