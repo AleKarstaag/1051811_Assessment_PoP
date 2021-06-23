@@ -5,17 +5,16 @@ from scipy.special.orthogonal import p_roots
 
 class SqGrid:
 
-    
+
     def __init__(self,l=100,n=4,m=25):
         if not isinstance(n,numbers.Integral):
             raise TypeError(f"{n} is not an integer")
         xd , yd = np.meshgrid(np.linspace(0,l,n),np.linspace(0,l,n))
-        hypotenuse = np.sqrt(xd[0,1]**2 + yd[1,0]**2)
         nodes = np.transpose((np.concatenate(xd[1:-1,1:-1]),np.concatenate(yd[1:-1,1:-1])))
         #notice: Number of nodes = (n-2)(n-2)
         xv,yv = np.meshgrid(np.linspace(0,l,round(n*m)),np.linspace(0,l,round(n*m)))
+        self.h = xd[0,1]
         self.dim = (len(xv),len(yv[0]))
-        self.h = np.sin(np.pi/4)*hypotenuse
         self.nodes = nodes
         self.mesh = xv,yv
         self.area= xv[0,-1]*yv[-1,0]
