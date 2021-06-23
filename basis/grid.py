@@ -1,9 +1,9 @@
 import numpy as np 
 import numbers
-from basis.basis import basis, GaussLegendre, finite_basis
-from scipy.special.orthogonal import p_roots
+from basis.basis import nodal_basis_codomain, GaussLegendre, nodal_basis, nodal_basis_x, nodal_basis_y
+from scipy import linalg
 
-class SqGrid:
+class Poisson:
 
 
     def __init__(self,l=100,n=4,m=25):
@@ -18,16 +18,16 @@ class SqGrid:
         self.nodes = nodes
         self.mesh = xv,yv
         self.area= xv[0,-1]*yv[-1,0]
+        self.a,self.b=self.mesh[0][0,0],self.mesh[0][0,-1]
+        self.c,self.d=self.mesh[1][0,0],self.mesh[1][-1,0]
 
-   
     def _evaluate(self,k):
         """"Returns a grid representing the codomain of the piecewise-continuos basis
         linear function corresponding to the k-th nodal point.
         """
-        res=basis(self.mesh,self.nodes[k],self.h)
+        res=nodal_basis_codomain(self.mesh,self.nodes[k],self.h)
         return res
 
-    
     def _check(self,k):
         """Continuos piecewise linear basis functions should map their corresponding nodes to
         the value: 1. The computational grid doesn't necesessarily generate the nodal point.
@@ -63,23 +63,54 @@ class SqGrid:
     #                 res[i,j]=0
     #     return res
 
-    """Integrators"""
+    """Solver"""
 
-    def _inner(self,k,n=7,f=lambda x,y: 1):
+    def _F(self,k,f=lambda x,y: 1,n=20):
         """Gauss-Legendre approximation (n degree) of the integral of
            the k-th piecewise continuos linear function times 
            an arbitrary function f over the whole domain of the problem.
            In short: 
            let ( u , v )= int_{Omega} u v
-           The method approximates:
-                    ( phi_k(x,y) , f(x,y) ) if 3 inputs are given
-                    ||phi_k(x,y)||^2 if 1 or 2 inputs are given
+           The method can approximate:
+
+                    ( phi_k(x,y) , f(x,y) ) = F(phi_k) 
+                    or
+                    ||phi_k(x,y)||^2 
                     """
-        a,b=self.mesh[0][0,0],self.mesh[0][0,-1]
-        c,d=self.mesh[1][0,0],self.mesh[1][-1,0]
-        phi=lambda x,y: finite_basis(x,y,self.nodes[k],self.h)
-        G=GaussLegendre(phi,f,a,b,c,d,n)
+        phi=lambda x,y: nodal_basis(x,y,self.nodes[k],self.h)
+        G=GaussLegendre(phi,f,self.a,self.b,self.c,self.d,n)
         return G
+
+    def _b(self,f=lambda x,y: 1,n=100):
+        b=np.zeros(len(self.nodes))
+        for i in range(len(self.nodes)):
+            b[i]=self._F(i,f,n)
+        return b
+
+    def _a(self,i,j,n=100):
+        phi_i_x=lambda x,y: nodal_basis_x(x,y,self.nodes[i],self.h)
+        phi_j_x=lambda x,y: nodal_basis_x(x,y,self.nodes[j],self.h)
+        phi_i_y=lambda x,y: nodal_basis_y(x,y,self.nodes[i],self.h)
+        phi_j_y=lambda x,y: nodal_basis_y(x,y,self.nodes[j],self.h)
+        Gx=GaussLegendre(phi_i_x,phi_j_x,self.a,self.b,self.c,self.d,n)
+        Gy=GaussLegendre(phi_i_y,phi_j_y,self.a,self.b,self.c,self.d,n)
+        return Gx+Gy
+    
+    def _A(self,n=300):
+        A=np.zeros((len(self.nodes),len(self.nodes)))
+        for i in range(len(self.nodes)):
+            for j in range(len(self.nodes)):
+                A[i,j]=self._a(i,j,n)
+        return A
+
+    def _U(self,f=lambda x,y: 1,n=300):
+        U=linalg.solve(self._A(n),self._b(f,round(n/3)))
+        return U
+    
+    def u(self,f,n):
+        U=self._U(f,n)
+        u=lambda x,y: 
+
 
     # def _MC(self,k):
     #     """Integrate the continuos piecewise linear function corresponding to the 
@@ -103,15 +134,3 @@ class SqGrid:
     
 class EstimationError(Exception):
     pass
-
-
-    
-
-    
-
-
-
-
-  
-    
-

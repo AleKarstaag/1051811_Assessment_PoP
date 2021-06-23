@@ -10,7 +10,7 @@ def dim(matrix):
     else:
         return (len(matrix),len(matrix[0]))
     
-def finite_basis(x,y,nodal_point,h):
+def nodal_basis(x,y,nodal_point,h):
     """Finite basis function."""
     x_i=nodal_point[0]
     y_j=nodal_point[1]
@@ -31,16 +31,16 @@ def finite_basis(x,y,nodal_point,h):
     else:
         return 0
 
-def basis(mesh,nodal_point,h):
+def nodal_basis_codomain(mesh,nodal_point,h):
     xd=mesh[0]
     yd=mesh[1]
     res=np.zeros(dim(xd))
     for i in range(dim(xd)[0]):
         for j in range(dim(xd)[1]):  
-            res[i,j]= finite_basis(xd[i,j],yd[i,j],nodal_point,h)
+            res[i,j]= nodal_basis(xd[i,j],yd[i,j],nodal_point,h)
     return res
 
-def partial_y_finite_basis(x,y,nodal_point,h):
+def nodal_basis_y(x,y,nodal_point,h):
     """Finite basis function."""
     x_i=nodal_point[0]
     y_j=nodal_point[1]
@@ -55,7 +55,7 @@ def partial_y_finite_basis(x,y,nodal_point,h):
     else:
         return 0
 
-def partial_x_finite_basis(x,y,nodal_point,h):
+def nodal_basis_x(x,y,nodal_point,h):
     """Finite basis function."""
     x_i=nodal_point[0]
     y_j=nodal_point[1]
@@ -70,7 +70,7 @@ def partial_x_finite_basis(x,y,nodal_point,h):
     else:
         return 0
 
-def GaussLegendre(phi,f,a,b,c,d,n,):
+def GaussLegendre(phi,f,a,b,c,d,n=7):
     [xi,w]=p_roots(n+1)
     x=1/2*(1-xi)*a+1/2*(1+xi)*b
     y=1/2*(1-xi)*c+1/2*(1+xi)*d
@@ -80,7 +80,3 @@ def GaussLegendre(phi,f,a,b,c,d,n,):
             G[i,j]= w[i]*w[j]*phi(x[i],y[j])*f(x[i],y[j])
     G=np.sum(G)*(b-a)/2*(d-c)/2
     return G
-
-
-
-
