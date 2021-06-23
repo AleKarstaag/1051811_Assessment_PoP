@@ -1,12 +1,11 @@
 import numpy as np 
 import numbers
-from basis.basis import basis,GaussLegendre, finite_basis, phi_ij
-from scipy.integrate import quad
+from basis.basis import basis, GaussLegendre, finite_basis
 from scipy.special.orthogonal import p_roots
-
 
 class SqGrid:
 
+    
     def __init__(self,l=100,n=4,m=25):
         if not isinstance(n,numbers.Integral):
             raise TypeError(f"{n} is not an integer")
@@ -15,7 +14,6 @@ class SqGrid:
         nodes = np.transpose((np.concatenate(xd[1:-1,1:-1]),np.concatenate(yd[1:-1,1:-1])))
         #notice: Number of nodes = (n-2)(n-2)
         xv,yv = np.meshgrid(np.linspace(0,l,round(n*m)),np.linspace(0,l,round(n*m)))
-
         self.dim = (len(xv),len(yv[0]))
         self.h = np.sin(np.pi/4)*hypotenuse
         self.nodes = nodes
@@ -67,6 +65,23 @@ class SqGrid:
     #     return res
 
     """Integrators"""
+
+    def _inner(self,k,n=7,f=lambda x,y: 1):
+        """Gauss-Legendre approximation (n degree) of the integral of
+           the k-th piecewise continuos linear function times 
+           an arbitrary function f over the whole domain of the problem.
+           In short: 
+           let ( u , v )= int_{Omega} u v
+           The method approximates:
+                    ( phi_k(x,y) , f(x,y) ) if 3 inputs are given
+                    ||phi_k(x,y)||^2 if 1 or 2 inputs are given
+                    """
+        a,b=self.mesh[0][0,0],self.mesh[0][0,-1]
+        c,d=self.mesh[1][0,0],self.mesh[1][-1,0]
+        phi=lambda x,y: finite_basis(x,y,self.nodes[k],self.h)
+        G=GaussLegendre(phi,f,a,b,c,d,n)
+        return G
+
     # def _MC(self,k):
     #     """Integrate the continuos piecewise linear function corresponding to the 
     #        k-th node over the whole domain using a method similar to Monte-Carlo.
@@ -86,22 +101,6 @@ class SqGrid:
     #     for y in self.mesh[1][:,0]:
     #         I.append(quad(phi_ij,self.mesh[0][0,0],self.mesh[0][0,-1],args=(y,x_i,y_j,self.h))[0])
     #     return np.sum(I)/np.size(I)*self.mesh[1][-1,0]
-    
-    def _inner(self,k,f=lambda x,y: 1,n=7):
-        """Gauss-Legendre approximation (n degree) of the integral of
-           the k-th piecewise continuos linear function times 
-           an arbitrary function f over the whole domain of the problem.
-           In short: 
-           let ( u , v )= int_{Omega} u v
-           The method approximates:
-                    ( phi_k(x,y) , f(x,y) ) if 2 or 3 inputs are given
-                    ||phi_k(x,y)||^2 if 1 input is given
-                    """
-        a,b=self.mesh[0][0,0],self.mesh[0][0,-1]
-        c,d=self.mesh[1][0,0],self.mesh[1][-1,0]
-        phi=lambda x,y: finite_basis(x,y,self.nodes[k],self.h)
-        G=GaussLegendre(phi,f,a,b,c,d,n)
-        return G
     
 class EstimationError(Exception):
     pass
