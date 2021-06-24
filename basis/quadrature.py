@@ -1,4 +1,5 @@
 import numpy as np
+from scipy.special.orthogonal import p_roots
 
 def GaussLegendre(phi,f,a,b,c,d,n=7):
     [xi,w]=p_roots(n+1)
