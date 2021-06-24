@@ -1,12 +1,9 @@
 import numpy as np 
 import numbers
-from basis.basis import nodal_basis_codomain, GaussLegendre, nodal_basis, nodal_basis_x, nodal_basis_y
+from basis.Dirichlet import GaussLegendre, nodal_basis, nodal_basis_x, nodal_basis_y
 from scipy import linalg
-
-class Poisson:
-
-
-    def __init__(self,l=100,n=4,m=25):
+class Elliptic:
+    def __init__(self,n=4,l=100,m=25,f=None):
         if not isinstance(n,numbers.Integral):
             raise TypeError(f"{n} is not an integer")
         xd , yd = np.meshgrid(np.linspace(0,l,n),np.linspace(0,l,n))
@@ -20,40 +17,56 @@ class Poisson:
         self.area= xv[0,-1]*yv[-1,0]
         self.a,self.b=self.mesh[0][0,0],self.mesh[0][0,-1]
         self.c,self.d=self.mesh[1][0,0],self.mesh[1][-1,0]
+        self.f=f
+class Poisson(Elliptic):
+    # def __init__(self,l=100,n=4,m=25):
+    #     if not isinstance(n,numbers.Integral):
+    #         raise TypeError(f"{n} is not an integer")
+    #     xd , yd = np.meshgrid(np.linspace(0,l,n),np.linspace(0,l,n))
+    #     nodes = np.transpose((np.concatenate(xd[1:-1,1:-1]),np.concatenate(yd[1:-1,1:-1])))
+    #     #notice: Number of nodes = (n-2)(n-2)
+    #     xv,yv = np.meshgrid(np.linspace(0,l,round(n*m)),np.linspace(0,l,round(n*m)))
+    #     self.h = xd[0,1]
+    #     self.dim = (len(xv),len(yv[0]))
+    #     self.nodes = nodes
+    #     self.mesh = xv,yv
+    #     self.area= xv[0,-1]*yv[-1,0]
+    #     self.a,self.b=self.mesh[0][0,0],self.mesh[0][0,-1]
+    #     self.c,self.d=self.mesh[1][0,0],self.mesh[1][-1,0]
 
-    def _evaluate(self,k):
-        """"Returns a grid representing the codomain of the piecewise-continuos basis
-        linear function corresponding to the k-th nodal point.
-        """
-        res=nodal_basis_codomain(self.mesh,self.nodes[k],self.h)
-        return res
+    # def _evaluate(self,k):
+    #     """"Returns a grid representing the codomain of the piecewise-continuos basis
+    #     linear function corresponding to the k-th nodal point.
+    #     """
+    #     res=nodal_basis_codomain(self.mesh,self.nodes[k],self.h)
+    #     return res
 
-    def _check(self,k):
-        """Continuos piecewise linear basis functions should map their corresponding nodes to
-        the value: 1. The computational grid doesn't necesessarily generate the nodal point.
-        This function has been created only to check approximately whether the function has been coded correctly.
-        """ 
-        res = self.evaluate(k)
-        if 0.965<=res[round(self.nodes[k][1]),round(self.nodes[k][0])]<=1:
-            return f"({round(self.nodes[k][0])},{round(self.nodes[k][1])}) seems correct."
-        elif 0.94<=res[round(self.nodes[k][1]),round(self.nodes[k][0])]<0.965:
-            raise Warning(f"({round(self.nodes[k][0])},{round(self.nodes[k][1])}) might not be correct.")
-        else:
-            raise EstimationError("Not correct.")
+    # def _check(self,k):
+    #     """Continuos piecewise linear basis functions should map their corresponding nodes to
+    #     the value: 1. The computational grid doesn't necesessarily generate the nodal point.
+    #     This function has been created only to check approximately whether the function has been coded correctly.
+    #     """ 
+    #     res = self.evaluate(k)
+    #     if 0.965<=res[round(self.nodes[k][1]),round(self.nodes[k][0])]<=1:
+    #         return f"({round(self.nodes[k][0])},{round(self.nodes[k][1])}) seems correct."
+    #     elif 0.94<=res[round(self.nodes[k][1]),round(self.nodes[k][0])]<0.965:
+    #         raise Warning(f"({round(self.nodes[k][0])},{round(self.nodes[k][1])}) might not be correct.")
+    #     else:
+    #         raise EstimationError("Not correct.")
 
-    def _machine_errors(self,k):
-        """Returns coordinate of points where the function 
-           finite_basis maps to a negative value.
-           This has been used often to 
-           check whether the function has been defined correctly.
-           """
-        res=self.evaluate(k)
-        logic=[]
-        for i in range(len(res)):
-            for j in range(len(res[0])):
-                if res[i,j]<0:
-                    logic.append(f"({i},{j})")
-        return np.transpose(logic)
+    # def _machine_errors(self,k):
+    #     """Returns coordinate of points where the function 
+    #        finite_basis maps to a negative value.
+    #        This has been used often to 
+    #        check whether the function has been defined correctly.
+    #        """
+    #     res=self.evaluate(k)
+    #     logic=[]
+    #     for i in range(len(res)):
+    #         for j in range(len(res[0])):
+    #             if res[i,j]<0:
+    #                 logic.append(f"({i},{j})")
+    #     return np.transpose(logic)
 
     # def _clean_evaluate(self,k):
     #     res=self.evaluate(k)
@@ -63,31 +76,25 @@ class Poisson:
     #                 res[i,j]=0
     #     return res
 
-    """Solver"""
-
-    def _F(self,k,f=lambda x,y: 1,n=20):
-        """Gauss-Legendre approximation (n degree) of the integral of
-           the k-th piecewise continuos linear function times 
-           an arbitrary function f over the whole domain of the problem.
-           In short: 
-           let ( u , v )= int_{Omega} u v
-           The method can approximate:
-
-                    ( phi_k(x,y) , f(x,y) ) = F(phi_k) 
-                    or
-                    ||phi_k(x,y)||^2 
-                    """
+    def _F(self,k,f=None,n=20):
+        """Linear form of the variational formulation of 2D-Poisson PDE."""
+        if f==None:
+            f=self.f     
         phi=lambda x,y: nodal_basis(x,y,self.nodes[k],self.h)
         G=GaussLegendre(phi,f,self.a,self.b,self.c,self.d,n)
         return G
 
     def _b(self,f=lambda x,y: 1,n=100):
+        """Returns the b vector of the final linear system."""
         b=np.zeros(len(self.nodes))
         for i in range(len(self.nodes)):
             b[i]=self._F(i,f,n)
         return b
 
     def _a(self,i,j,n=100):
+        """Bilinear form of the variational formulation of 
+        2D-Poisson PDE with Dirichelt BCs."""
+
         phi_i_x=lambda x,y: nodal_basis_x(x,y,self.nodes[i],self.h)
         phi_j_x=lambda x,y: nodal_basis_x(x,y,self.nodes[j],self.h)
         phi_i_y=lambda x,y: nodal_basis_y(x,y,self.nodes[i],self.h)
@@ -97,6 +104,7 @@ class Poisson:
         return Gx+Gy
     
     def _A(self,n=300):
+        """Returns the A matrix of the final linear system."""
         A=np.zeros((len(self.nodes),len(self.nodes)))
         for i in range(len(self.nodes)):
             for j in range(len(self.nodes)):
@@ -107,9 +115,13 @@ class Poisson:
         U=linalg.solve(self._A(n),self._b(f,round(n/3)))
         return U
     
-    def u(self,f,n):
+    def _u(self,x,y,f,n):
         U=self._U(f,n)
-        u=lambda x,y: 
+        res=np.zeros(len(self.nodes))
+        for i in range(len(self.nodes)):
+            res[i]=nodal_basis(x,y,self.nodes[i],self.h)
+        return np.dot(U,res)
+        
 
 
     # def _MC(self,k):

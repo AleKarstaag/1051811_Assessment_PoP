@@ -1,5 +1,4 @@
 import numpy as np 
-import numbers
 from scipy.integrate import quad
 from scipy.special.orthogonal import p_roots
 
@@ -31,14 +30,14 @@ def nodal_basis(x,y,nodal_point,h):
     else:
         return 0
 
-def nodal_basis_codomain(mesh,nodal_point,h):
-    xd=mesh[0]
-    yd=mesh[1]
-    res=np.zeros(dim(xd))
-    for i in range(dim(xd)[0]):
-        for j in range(dim(xd)[1]):  
-            res[i,j]= nodal_basis(xd[i,j],yd[i,j],nodal_point,h)
-    return res
+# def nodal_basis_codomain(mesh,nodal_point,h):
+#     xd=mesh[0]
+#     yd=mesh[1]
+#     res=np.zeros(dim(xd))
+#     for i in range(dim(xd)[0]):
+#         for j in range(dim(xd)[1]):  
+#             res[i,j]= nodal_basis(xd[i,j],yd[i,j],nodal_point,h)
+#     return res
 
 def nodal_basis_y(x,y,nodal_point,h):
     """Finite basis function."""
