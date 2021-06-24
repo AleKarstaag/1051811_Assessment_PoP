@@ -3,30 +3,37 @@ import numbers
 from basis.Dirichlet import nodal_basis, nodal_basis_x, nodal_basis_y
 from basis.quadrature import GaussLegendre
 from scipy import linalg
+
+
 class Elliptic:
-    def __init__(self,n=4,l=100,m=25,f=None):
-        if not isinstance(n,numbers.Integral):
+
+    def __init__(self, n=4, length=100, m=25, f=None):
+        if not isinstance(n, numbers.Integral):
             raise TypeError(f"{n} is not an integer")
-        xd , yd = np.meshgrid(np.linspace(0,l,n),np.linspace(0,l,n))
-        nodes = np.transpose((np.concatenate(xd[1:-1,1:-1]),np.concatenate(yd[1:-1,1:-1])))
-        #notice: Number of nodes = (n-2)(n-2)
-        xv,yv = np.meshgrid(np.linspace(0,l,round(n*m)),np.linspace(0,l,round(n*m)))
-        self.h = xd[0,1]
-        self.dim = (len(xv),len(yv[0]))
+        xd, yd = np.meshgrid(
+            np.linspace(0, length, n), np.linspace(0, length, n))
+        nodes = np.transpose(
+            (np.concatenate(xd[1:-1, 1:-1]), np.concatenate(yd[1:-1, 1:-1])))
+        # notice: Number of nodes = (n-2)(n-2)
+        xv, yv = np.meshgrid(
+            np.linspace(0, length, round(n*m)),
+            np.linspace(0, length, round(n*m)))
+        self.h = xd[0, 1]
+        self.dim = (len(xv), len(yv[0]))
         self.nodes = nodes
-        self.mesh = xv,yv
-        self.area= xv[0,-1]*yv[-1,0]
-        self.a,self.b=self.mesh[0][0,0],self.mesh[0][0,-1]
-        self.c,self.d=self.mesh[1][0,0],self.mesh[1][-1,0]
-        self.f=f
+        self.mesh = xv, yv
+        self.area = xv[0, -1]*yv[-1, 0]
+        self.a, self.b = self.mesh[0][0, 0], self.mesh[0][0, -1]
+        self.c, self.d = self.mesh[1][0, 0], self.mesh[1][-1, 0]
+        self.f = f
+
 
 class Poisson(Elliptic):
 
-   
-    def _F(self,k,f=None,n=20):
+    def _l(self, k, f=None, n=20):
         """Linear form of the variational formulation of 2D-Poisson PDE."""
-        if f==None:
-            f=self.f     
+        if f is None:
+            f = self.f     
         phi=lambda x,y: nodal_basis(x,y,self.nodes[k],self.h)
         G=GaussLegendre(phi,f,self.a,self.b,self.c,self.d,n)
         return G
@@ -35,7 +42,7 @@ class Poisson(Elliptic):
         """Returns the b vector of the final linear system."""
         b=np.zeros(len(self.nodes))
         for i in range(len(self.nodes)):
-            b[i]=self._F(i,f,n)
+            b[i]=self._l(i,f,n)
         return b
 
     def _a(self,i,j,n=100):
