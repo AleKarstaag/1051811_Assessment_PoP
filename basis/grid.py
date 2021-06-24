@@ -19,6 +19,7 @@ class Elliptic:
         self.a,self.b=self.mesh[0][0,0],self.mesh[0][0,-1]
         self.c,self.d=self.mesh[1][0,0],self.mesh[1][-1,0]
         self.f=f
+
 class Poisson(Elliptic):
 
    
