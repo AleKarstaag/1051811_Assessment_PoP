@@ -6,3 +6,10 @@
 #         for j in range(dim(xd)[1]):  
 #             res[i,j]= nodal_basis(xd[i,j],yd[i,j],nodal_point,h)
 #     return res
+
+# def dim(matrix):
+#     """Returns a tuple identifying the number of rows and number of columns of the array."""
+#     if not type(matrix)==np.ndarray:
+#         raise NotImplementedError('Make sure the argument is a numpy.ndarray')
+#     else:
+#         return (len(matrix),len(matrix[0]))

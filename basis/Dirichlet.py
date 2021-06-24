@@ -1,12 +1,5 @@
 import numpy as np 
 
-def dim(matrix):
-    """Returns a tuple identifying the number of rows and number of columns of the array."""
-    if not type(matrix)==np.ndarray:
-        raise NotImplementedError('Make sure the argument is a numpy.ndarray')
-    else:
-        return (len(matrix),len(matrix[0]))
-    
 def nodal_basis(x,y,nodal_point,h):
     """Finite basis function."""
     x_i=nodal_point[0]
