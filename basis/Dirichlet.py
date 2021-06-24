@@ -1,4 +1,3 @@
-import numpy as np 
 
 def nodal_basis(x,y,nodal_point,h):
     """Finite basis function."""
