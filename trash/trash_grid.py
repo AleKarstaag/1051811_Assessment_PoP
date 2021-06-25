@@ -59,3 +59,15 @@
     #     for y in self.mesh[1][:,0]:
     #         I.append(quad(phi_ij,self.mesh[0][0,0],self.mesh[0][0,-1],args=(y,x_i,y_j,self.h))[0])
     #     return np.sum(I)/np.size(I)*self.mesh[1][-1,0]
+    
+# class Class1:
+#     def __init__(self,value1,value2):
+#         self.attr1=value1
+#         self.attr2=value1*2
+#         self.attr3=value1+value2
+
+# class Class2(Class1):
+#     def __init__(self, value1,value2,extra_val1):
+#         super().__init__(value1,value2)
+#         self.extra=extra_val1
+    
