@@ -3,6 +3,7 @@ import numbers
 from basis.Dirichlet import nodal_basis, nodal_basis_x, nodal_basis_y
 from basis.quadrature import GaussLegendre, GaussLegendre3
 from scipy import linalg
+from tqdm import trange
 
 
 class Elliptic:
@@ -26,6 +27,7 @@ class Elliptic:
         self.area = xv[0, -1]*yv[-1, 0]
         self.a, self.b , self.c, self.d =xv[0,0],xv[0,-1],yv[0,0],yv[-1,0]
         
+        
 class Poisson(Elliptic):
     
 
@@ -38,14 +40,14 @@ class Poisson(Elliptic):
     def _L(self,f=lambda x,y: 1,n=100):
         """Returns and store as an attribute the b vector of the final linear system."""
         L=np.zeros(len(self.nodes))
-        for i in range(len(self.nodes)):
+        for i in trange(len(self.nodes)):
             L[i]=self._l(i,f,n)
         self.L=L
         return L
 
     def _a(self,i,j,n=100):
         """Bilinear form of the variational formulation of 
-        2D-Poisson PDE with Zero BCs."""
+        2D-Poisson PDE with Dirichelt BCs."""
 
         phi_i_x=lambda x,y: nodal_basis_x(x,y,self.nodes[i],self.h)
         phi_j_x=lambda x,y: nodal_basis_x(x,y,self.nodes[j],self.h)
@@ -58,7 +60,7 @@ class Poisson(Elliptic):
     def _A(self,n=300):
         """Returns and store as an attribute the A matrix of the final linear system."""
         self.A=np.zeros((len(self.nodes),len(self.nodes)))
-        for i in range(len(self.nodes)):
+        for i in trange(len(self.nodes)):
             for j in range(len(self.nodes)):
                 self.A[i,j]=self._a(i,j,n)
         return self.A
@@ -67,7 +69,7 @@ class Poisson(Elliptic):
         """Returns and store as an attribute the U vector of coefficients."""
         if AttributeError:
             raise AttributeError(f"{type(self).__name__} object has no attribute A or L."
-            "Make sure you run _L() and _A() before running ._U() in order to store the relevant attributes.")
+            " Make sure you run _L() and _A() before running _U() in order to store the relevant attributes.")
         
         self.U=linalg.solve(self.A,self.L)
         return self.U
@@ -76,15 +78,15 @@ class Poisson(Elliptic):
         """Approximated solution u(x,y)."""    
         if AttributeError:
             raise AttributeError(f"{type(self).__name__} object has no attribute U."
-            "Make sure you run _U() before running u() in order to store the relevant attribute.")
+            " Make sure you run _U() before running u() in order to store the relevant attribute.")
         res=np.zeros(len(self.nodes))
-        for i in range(len(self.nodes)):
+        for i in trange(len(self.nodes)):
             res[i]=nodal_basis(x,y,self.nodes[i],self.h)
         return np.dot(self.U,res)
     
 
 class Helmotz(Poisson):
-    
+
 
     def __init__(self, n=4, length=100, m=25,ksq = lambda x,y: 4**2 ):
         super().__init__(n, length, m)
