@@ -7,6 +7,7 @@ from scipy import linalg
 
 class Elliptic:
 
+
     def __init__(self, n=4, length=100, m=25):
         if not isinstance(n, numbers.Integral):
             raise TypeError(f"{n} is not an integer")
@@ -25,8 +26,6 @@ class Elliptic:
         self.area = xv[0, -1]*yv[-1, 0]
         self.a, self.b , self.c, self.d =xv[0,0],xv[0,-1],yv[0,0],yv[-1,0]
         
-        
-
 class Poisson(Elliptic):
     
 
@@ -66,11 +65,18 @@ class Poisson(Elliptic):
 
     def _U(self): # requires running self._A() and self._L() beforehand
         """Returns and store as an attribute the U vector of coefficients."""
+        if AttributeError:
+            raise AttributeError(f"{type(self).__name__} object has no attribute A or L."
+            "Make sure you run _L() and _A() before running ._U() in order to store the relevant attributes.")
+        
         self.U=linalg.solve(self.A,self.L)
         return self.U
     
     def u(self,x,y): # requires running self._U() beforehand
-        """Approximated solution u(x,y)."""
+        """Approximated solution u(x,y)."""    
+        if AttributeError:
+            raise AttributeError(f"{type(self).__name__} object has no attribute U."
+            "Make sure you run _U() before running u() in order to store the relevant attribute.")
         res=np.zeros(len(self.nodes))
         for i in range(len(self.nodes)):
             res[i]=nodal_basis(x,y,self.nodes[i],self.h)
@@ -78,6 +84,7 @@ class Poisson(Elliptic):
     
 
 class Helmotz(Poisson):
+    
 
     def __init__(self, n=4, length=100, m=25,ksq = lambda x,y: 4**2 ):
         super().__init__(n, length, m)
