@@ -70,4 +70,12 @@
 #     def __init__(self, value1,value2,extra_val1):
 #         super().__init__(value1,value2)
 #         self.extra=extra_val1
-    
+
+# phi_i_x=lambda x,y: nodal_basis_x(x,y,self.nodes[i],self.h)
+# phi_j_x=lambda x,y: nodal_basis_x(x,y,self.nodes[j],self.h)
+# phi_i_y=lambda x,y: nodal_basis_y(x,y,self.nodes[i],self.h)
+# phi_j_y=lambda x,y: nodal_basis_y(x,y,self.nodes[j],self.h)
+
+        #     xv, yv = np.meshgrid(
+        #     np.linspace(0, length, round(n*m)),
+        #     np.linspace(0, length, round(n*m)))
