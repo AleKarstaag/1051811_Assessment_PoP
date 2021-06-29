@@ -53,7 +53,7 @@ def test_bilinear_matrix(n,GL_degree, A):
     (lambda x,y: np.cos(x-y)+np.log(x),300,6,100,np.zeros(300))
 ])
 
-def test_Dirichlet_boundary(f,length,n,GLdegree,boundary_value):
+def test_closure(f,length,n,GLdegree,boundary_value):
     from basis import Poisson
     P=Poisson(n,length)
     P._A(GLdegree)

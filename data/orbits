@@ -1,0 +1,23 @@
+This acted as sort of constructor for the S21(a) and S111(a,b) orbits in 
+data files. We also used the relevant command to change all occurences.
+The data set comes from:
+
+A SET OF SYMMETRIC QUADRATURE RULES
+ON TRIANGLES AND TETRAHEDRA *
+Linbo Zhang, Tao Cui and Hui Liu
+LSEC, ICMSEC, Academy of Mathematics and Systems Science,
+Chinese Academy of Sciences, Beijing 100190, China
+Email: zlb@lsec.cc.ac.cn, tcui@lsec.cc.ac.cn, liuhui@lsec.cc.ac.cn
+
+S21(a)
+a,a,1-2*a,w
+a,1-2*a,a,w
+1-2*a,a,a,w
+
+S111(a,b)
+a,b,1-a-b,w
+b,a,1-a-b,w
+1-a-b,a,b,w
+1-a-b,b,a,w
+a,1-a-b,b,w
+b,1-a-b,a,w
