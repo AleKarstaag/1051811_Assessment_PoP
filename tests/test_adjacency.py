@@ -12,8 +12,8 @@ import numpy.testing as npt
     (lambda x: 2*np.exp(x[0])*x[1],[0,0],[1,0],[1,1],np.exp(1)-2)
     ])
     
-def test_triangle_quadrature_rule(function, vertex_1,vertex_2,vertex_3,ans):
+def test_isontheright(function, vertex_1,vertex_2,vertex_3,ans):
     """Test """
-    from basis import triangle_quadrature_rule
+    from basis import EllipticDirichlet
     I,X,W=triangle_quadrature_rule(function,vertex_1,vertex_2,vertex_3)
-    npt.assert_almost_equal(I,ans , decimal=7)
+    npt.assert_equal(I,ans , decimal=7)

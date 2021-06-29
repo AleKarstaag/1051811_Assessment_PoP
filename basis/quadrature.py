@@ -12,19 +12,18 @@ def GaussLegendre1(function,interval,n=7):
             G[i,j]= w[i]*w[j]*function(x[i],y[j])
     return np.sum(G)*(interval[1]-interval[0])/2*(interval[3]-interval[2])/2
 
-def triangle_quadrature_rule(function,vertex_1,vertex_2,vertex_3,base_lenght=1,name_file=16):
-    dataframe=pd.read_csv(f"data/{name_file}.csv")
+def triangle_quadrature_rule(dataframe,function,vertex_1,vertex_2,vertex_3,base_lenght=1,name_file=16):
     vertices=np.transpose(np.array([vertex_1,vertex_2,vertex_3]))
-    quadrature_nodes=[]
-    weights=[]
+    # quadrature_nodes=[]
+    # weights=[]
     I=0
     for i in range(16):
         barycentric_coordinates=np.array([float(dataframe['X'][i]),float(dataframe['Y'][i]),float(dataframe['Z'][i])])
-        quadrature_nodes.append(vertices.dot(barycentric_coordinates))
-        weights.append(float(dataframe['Weight'][i]))
+        # quadrature_nodes.append(vertices.dot(barycentric_coordinates))
+        # weights.append(float(dataframe['Weight'][i]))
         I += base_lenght**2/2*function(vertices.dot(barycentric_coordinates))*float(dataframe['Weight'][i])
     
-    return I,quadrature_nodes, weights
+    return I
 
     
 
