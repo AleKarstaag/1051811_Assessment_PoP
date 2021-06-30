@@ -97,3 +97,30 @@
     #     """Linear form of the variational formulation of 2D-Poisson PDE."""
     #     integrand_linear_form=lambda x: self.phi(x[0],x[1],k)*f(x[0],x[1])
     #     return GaussLegendre1(integrand_linear_form,self.a,self.b,self.c,self.d,GL_degree)
+
+ # def _a(self,i,j,GL_degree=100):
+    #     """Bilinear form of the variational formulation of 
+    #     2D-Poisson PDE with Dirichelt BCs."""
+    #     integrand=lambda x,y: self.integrand_bilinear_form(x,y,i,j)
+    #     return GaussLegendre1(
+    #         integrand,self.support(i,j),GL_degree)
+# def _A(self,GL_degree=30):
+    #     """Returns and store as an attribute the A matrix of the final linear system."""
+    #     self.A=np.zeros((len(self.nodes),len(self.nodes)))
+    #     for i in trange(len(self.nodes)): # the code uses trange to get loading bar
+    #         for j in range(len(self.nodes)):
+    #             self.A[i,j]=self._a(i,j,GL_degree)
+    #     return self.A
+
+# def _l(self, k, f = lambda x,y: np.sin(x+y), GL_degree=100):
+    #     """Linear form of the variational formulation of 2D-Poisson PDE."""
+    #     integrand_linear_form=lambda x,y: self.phi(x,y,k)*f(x,y)
+    #     return GaussLegendre1(integrand_linear_form,self.a,self.b,self.c,self.d,GL_degree)
+    
+# def _L(self, f = lambda x,y: np.sin(x+y), GL_degree = 100):
+    #     """Returns and store as an attribute the b vector of the final linear system."""
+    #     L=np.zeros(len(self.nodes))
+    #     for i in range(len(self.nodes)):
+    #         L[i]=self._l(i,f,GL_degree)
+    #     self.L=L
+    #     return L

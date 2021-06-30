@@ -1,5 +1,6 @@
 This acted as sort of constructor for the S21(a) and S111(a,b) orbits in 
-data files. We also used the relevant command to change all occurences.
+data files 46.csv and 48.csv. It has also been used the relevant command 
+to change all occurences at once.
 The data set comes from:
 
 A SET OF SYMMETRIC QUADRATURE RULES
@@ -10,14 +11,15 @@ Chinese Academy of Sciences, Beijing 100190, China
 Email: zlb@lsec.cc.ac.cn, tcui@lsec.cc.ac.cn, liuhui@lsec.cc.ac.cn
 
 S21(a)
-a,a,1-2*a,w
-a,1-2*a,a,w
-1-2*a,a,a,w
+a,a,1-2*a,p
+a,1-2*a,a,p
+1-2*a,a,a,p
 
 S111(a,b)
-a,b,1-a-b,w
-b,a,1-a-b,w
-1-a-b,a,b,w
-1-a-b,b,a,w
-a,1-a-b,b,w
-b,1-a-b,a,w
+a,b,1-a-b,p
+b,a,1-a-b,p
+1-a-b,a,b,p
+1-a-b,b,a,p
+a,1-a-b,b,p
+b,1-a-b,a,p
+
