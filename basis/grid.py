@@ -43,25 +43,12 @@ class Elliptic:
         else:
             return 'None'
 
-    # def support(self,i,j):
-    #     a=self.nodes[i][0]
-    #     b=self.nodes[j][0]
-    #     c=self.nodes[i][1]
-    #     d=self.nodes[j][1]
-
-    #     if (a+self.h==b and c==d) or (a - self.h == + b and c==d ):
-    #         return min(a,b)-self.h/2,max(a,b)+self.h/2,c-self.h,c+self.h
-    #     elif (c+self.h==d and a==b) or (c-self.h==d and a==b):
-    #         return a-self.h,b+self.h,min(c,d)-self.h/2,max(c,d)+self.h/2
-    #     elif a==b and c==d:
-    #         return a-self.h,a+self.h,c-self.h,c+self.h
-    #     else:
-    #         return 0,0,0,0
+    
 class Poisson(Elliptic):
 
 
-    def __init__(self, nodal_value=12, length=100):
-        super().__init__(nodal_value, length)
+    def __init__(self, nodal_value=12, length=100,dataframe_file_name=16):
+        super().__init__(nodal_value, length, dataframe_file_name)
         self.integrand_bilinear_form = lambda x, y, i, j: (
         self.phi_x(x,y,i) * self.phi_x(x,y,j) 
         + self.phi_y(x,y,i) * self.phi_y(x,y,j)
@@ -71,11 +58,6 @@ class Poisson(Elliptic):
         """Linear form of the variational formulation of 2D-Poisson PDE."""
         integrand_linear_form=lambda x,y: self.phi(x,y,k)*f(x,y)
         return GaussLegendre1(integrand_linear_form,self.a,self.b,self.c,self.d,GL_degree)
-
-    # def _lk(self, k, f = lambda x,y: np.sin(x+y), GL_degree=100):
-    #     """Linear form of the variational formulation of 2D-Poisson PDE."""
-    #     integrand_linear_form=lambda x: self.phi(x[0],x[1],k)*f(x[0],x[1])
-    #     return GaussLegendre1(integrand_linear_form,self.a,self.b,self.c,self.d,GL_degree)
 
     def _L(self, f = lambda x,y: np.sin(x+y), GL_degree = 100):
         """Returns and store as an attribute the b vector of the final linear system."""
@@ -181,8 +163,8 @@ class Poisson(Elliptic):
 class Helmotz(Poisson):
     
 
-    def __init__(self, nodal_value=12, length=100, c=lambda x,y: 4):
-        super().__init__(nodal_value, length)
+    def __init__(self, nodal_value=12, length=100, dataframe_filename = 16 ,c=lambda x,y: 4):
+        super().__init__(nodal_value, length, dataframe_filename)
         self.ksq = c
         self.integrand_bilinear_form = lambda x,y,i,j: (
         self.phi_x(x, y, i) * self.phi_x(x, y, j) 

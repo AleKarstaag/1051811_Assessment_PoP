@@ -79,3 +79,21 @@
         #     xv, yv = np.meshgrid(
         #     np.linspace(0, length, round(n*m)),
         #     np.linspace(0, length, round(n*m)))
+# def support(self,i,j):
+    #     a=self.nodes[i][0]
+    #     b=self.nodes[j][0]
+    #     c=self.nodes[i][1]
+    #     d=self.nodes[j][1]
+
+    #     if (a+self.h==b and c==d) or (a - self.h == + b and c==d ):
+    #         return min(a,b)-self.h/2,max(a,b)+self.h/2,c-self.h,c+self.h
+    #     elif (c+self.h==d and a==b) or (c-self.h==d and a==b):
+    #         return a-self.h,b+self.h,min(c,d)-self.h/2,max(c,d)+self.h/2
+    #     elif a==b and c==d:
+    #         return a-self.h,a+self.h,c-self.h,c+self.h
+    #     else:
+    #         return 0,0,0,0
+# def _lk(self, k, f = lambda x,y: np.sin(x+y), GL_degree=100):
+    #     """Linear form of the variational formulation of 2D-Poisson PDE."""
+    #     integrand_linear_form=lambda x: self.phi(x[0],x[1],k)*f(x[0],x[1])
+    #     return GaussLegendre1(integrand_linear_form,self.a,self.b,self.c,self.d,GL_degree)

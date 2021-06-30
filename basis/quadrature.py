@@ -17,8 +17,11 @@ def triangle_quadrature_rule(dataframe,function,vertex_1,vertex_2,vertex_3,base_
     # quadrature_nodes=[]
     # weights=[]
     I=0
-    for i in range(16):
-        barycentric_coordinates=np.array([float(dataframe['X'][i]),float(dataframe['Y'][i]),float(dataframe['Z'][i])])
+    for i in range(len(dataframe)):
+        barycentric_coordinates=np.array([
+            float(dataframe['X'][i]),
+            float(dataframe['Y'][i]),
+            float(dataframe['Z'][i])])
         # quadrature_nodes.append(vertices.dot(barycentric_coordinates))
         # weights.append(float(dataframe['Weight'][i]))
         I += base_lenght**2/2*function(vertices.dot(barycentric_coordinates))*float(dataframe['Weight'][i])
