@@ -175,3 +175,4 @@ class Helmotz(Poisson):
         + self.phi_y(x, y, i) * self.phi_y(x, y, j) 
         + self.phi(x, y, i) * self.c(x, y) )
 
+
