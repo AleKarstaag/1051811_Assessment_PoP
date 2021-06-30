@@ -1,7 +1,7 @@
 import numpy as np 
 import numbers
 from basis.Dirichlet import nodal_basis, nodal_basis_x, nodal_basis_y
-from basis.quadrature import ZhangCuiLiu_triangle_quadrature_rule as quad
+from basis.quadrature import triangle_quadrature_rule as quad
 from scipy import linalg
 from tqdm import trange
 import pandas as pd
@@ -29,21 +29,20 @@ class Elliptic:
         self.data16=pd.read_csv(f"data/{16}.csv")
         self.data46=pd.read_csv(f"data/{46}.csv")
 
-    def isonthe(self,i,j):
-        if self.nodes[i][0]==self.nodes[j][0]+self.h and self.nodes[i][1]==self.nodes[j][1]:
+    def isonthe(self,i,j,tol=1e-10):
+        if abs(self.nodes[i][0]-self.nodes[j][0]-self.h)<=tol and self.nodes[i][1]==self.nodes[j][1]:
             return 'Right'
-        elif self.nodes[i][0]==self.nodes[j][0]-self.h and self.nodes[i][1]==self.nodes[j][1]:
+        elif abs(self.nodes[i][0]-self.nodes[j][0]+self.h)<=tol and self.nodes[i][1]==self.nodes[j][1]:
             return 'Left'
-        elif self.nodes[i][0]==self.nodes[j][0] and self.nodes[i][1]==self.nodes[j][1]+self.h:
+        elif self.nodes[i][0]==self.nodes[j][0] and abs(self.nodes[i][1]-self.nodes[j][1]-self.h)<=tol:
             return 'Top'
-        elif self.nodes[i][0]==self.nodes[j][0] and self.nodes[i][1]==self.nodes[j][1]-self.h:
+        elif self.nodes[i][0]==self.nodes[j][0] and abs(self.nodes[i][1]-self.nodes[j][1]+self.h)<=tol:
             return 'Low'
         elif self.nodes[i][0]==self.nodes[j][0] and self.nodes[i][1]==self.nodes[j][1]:
             return 'Same'
         else:
             return 'None'
 
-    
 class Poisson(Elliptic):
 
 
@@ -144,19 +143,24 @@ class Poisson(Elliptic):
 
     def _U(self):
         """Returns and store as an attribute the U vector of coefficients."""
-        if isinstance(self.A,str) or isinstance(self.L,str):
+        if isinstance(self.A,str) or isinstance(self.b,str):
             self._A()
             self._b()
         self.U=linalg.solve(self.A,self.b)
         return 'Done!'
     
-    def solve(self): 
-        """Approximated solution u(x,y)."""    
+    def uh(self,x,y): 
+        """Approximated solution u(x,y)."""
         if isinstance(self.U,str):
             self._U()
-        
-    
+        res=0
+        for i in range(len(self.nodes)):
+            res+=self.U[i]*self.phi(x,y,i)
+        return res
 
+    def u(self,x,y):
+        return self.f(x,y)/self.C        
+        
 class Helmotz(Poisson):
     
 
