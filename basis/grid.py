@@ -23,11 +23,11 @@ class Elliptic:
         self.phi_y = lambda x, y, k: nodal_basis_y(x, y, self.nodes[k], self.h)
         self.A = "Need to run the _A() method to get numerical value."
         self.b = "Need to run the _L() method to get numerical value."
-        self.U = "Need to run the _U() method to get numerical value."
+        self.alpha = "Need to run the _U() method to get numerical value."
         self.L2error= "Need to run the _L2error() method to get numerical value."
         self.data16=pd.read_csv(f"data/{16}.csv")
         self.data46=pd.read_csv(f"data/{46}.csv")
-        self.domain=[(origin[0], length+origin[0]),(origin[1], length+origin[1])]
+        self.domain=[origin[0], length+origin[0],origin[1], length+origin[1]]
     
     def __repr__(self):
         return self.__class__.__name__ + " with x in " + repr(
@@ -51,7 +51,7 @@ class Elliptic:
 class Poisson(Elliptic):
 
 
-    def __init__(self, nodal_value=12, length=100, origin=[0,0],
+    def __init__(self, nodal_value=12, length=100, origin= [0,0],
                 f=lambda x,y: 
                 (2*np.pi**2/(100**2)) * np.sin(x*np.pi/100) * np.sin(y*np.pi/100),
                 u=lambda x,y: np.sin(x*np.pi/100) * np.sin(y*np.pi/100)
@@ -156,27 +156,34 @@ class Poisson(Elliptic):
         return "Done!"
     
     def _alpha(self):
-        """Returns and store as an attribute the alpha vector of coefficients."""
+        """Store as an attribute the alpha vector of coefficients."""
         if isinstance(self.A,str) or isinstance(self.b,str):
-            self._A()
-            self._b()
+            self.A=np.zeros((len(self.nodes),len(self.nodes)))
+            self.b=np.zeros(len(self.nodes))
+            for i in trange(len(self.nodes)): # the code uses trange to get loading bar
+                self.b[i]=self._l(i)
+                for j in range(len(self.nodes)):
+                    self.A[i,j]=self._a(i,j)
+        
         self.alpha=linalg.solve(self.A,self.b)
         return 'Done!'
     
     def uh(self,x,y): 
-        """Approximated solution u(x,y)."""
-        if isinstance(self.U,str):
+        """Approximated solution evaluated at cartesian coordinates (x,y)."""
+        if isinstance(self.alpha,str):
             self._alpha()
         res=0
         for i in range(len(self.nodes)):
             res+=self.alpha[i]*self.phi(x,y,i)
         return res
     
-    def _L2error(self,n):
+    def error(self,GLdegree=7):
         if isinstance(self.L2error,str):
             self.uh(self.length/2,self.length/2)
         self.L2error=L2error(lambda x,y: self.uh(x,y),
-            lambda x,y: self.u(x,y),0,self.length,0,self.length,n)
+            lambda x,y: self.u(x,y),
+            self.domain[0],self.domain[1],self.domain[2],self.domain[3],
+            GLdegree)
         return self.L2error
           
 class Helmotz(Poisson):
@@ -186,8 +193,8 @@ class Helmotz(Poisson):
         nodal_value=12, 
         length=100, 
         origin= [0,0],
-        f=lambda x,y: (2*np.pi**2/(100**2)+1)*np.sin(x*np.pi/100)*np.sin(y*np.pi/100),
-        u=lambda x,y: np.sin(x*np.pi/100)*np.sin(y*np.pi/100),
+        f=lambda x,y: 200*(x+y)-2*(x**2+y**2)+(x**2-100*x)*(y**2-100*y),
+        u=lambda x,y: (x**2-100*x)*(y**2-100*y),
         c=lambda x,y: 1):
         super().__init__(nodal_value, length, origin, f, u)
         self.c = lambda x,y : c(x,y)
