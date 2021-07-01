@@ -1,10 +1,10 @@
 import numpy as np 
-import numbers
 from basis.Dirichlet import nodal_basis, nodal_basis_x, nodal_basis_y
-from basis.quadrature import triangle_quadrature_rule as quad
+from basis.quadrature import triangle_quadrature_rule as quad, GaussLegendre,L2error
 from scipy import linalg
 from tqdm import trange
 import pandas as pd
+
 
 
 class Elliptic:
@@ -12,7 +12,7 @@ class Elliptic:
 
     def __init__(self, nodal_value=12, length=100):
         # Number of desiderd nodes = (nodal_value-2)^2
-        if not isinstance(nodal_value, numbers.Integral) and nodal_value<=2:
+        if not isinstance(nodal_value, int) and nodal_value<=2:
             raise TypeError(f"{n} is not an integer greater then 2")
         xd, yd = np.meshgrid(
             np.linspace(0, length, nodal_value), np.linspace(0, length, nodal_value))
@@ -48,14 +48,16 @@ class Poisson(Elliptic):
 
     def __init__(self, nodal_value=12, length=100,
                 f=lambda x,y: 
-                (2*np.pi**2/(100**2)) * np.sin(x*np.pi/100) * np.sin(y*np.pi/100)
+                (2*np.pi**2/(100**2)) * np.sin(x*np.pi/100) * np.sin(y*np.pi/100),
+                u=lambda x,y: np.sin(x*np.pi/100) * np.sin(y*np.pi/100)
                 ):
         super().__init__(nodal_value, length)
         self.integrand_bilinear_form = lambda x, y, i, j:(
             self.phi_x(x,y,i) * self.phi_x(x,y,j) 
             + self.phi_y(x,y,i) * self.phi_y(x,y,j))
         self.f= f
-        self.C=2*np.pi**2/(100**2)
+        self.u=u
+        
     
     def _l(self,i):
         integrand=lambda x: self.phi(x[0],x[1],i)*self.f(x[0],x[1])
@@ -141,34 +143,39 @@ class Poisson(Elliptic):
                 self.A[i,j]=self._a(i,j)
         return "Done!"
 
-    def _U(self):
-        """Returns and store as an attribute the U vector of coefficients."""
+    def _alpha(self):
+        """Returns and store as an attribute the alpha vector of coefficients."""
         if isinstance(self.A,str) or isinstance(self.b,str):
             self._A()
             self._b()
-        self.U=linalg.solve(self.A,self.b)
+        self.alpha=linalg.solve(self.A,self.b)
         return 'Done!'
     
     def uh(self,x,y): 
         """Approximated solution u(x,y)."""
         if isinstance(self.U,str):
-            self._U()
+            self._alpha()
         res=0
         for i in range(len(self.nodes)):
-            res+=self.U[i]*self.phi(x,y,i)
+            res+=self.alpha[i]*self.phi(x,y,i)
         return res
-
-    def u(self,x,y):
-        return self.f(x,y)/self.C        
+    
+    def _error(self,n):
+        self.uh(self.length/2,self.length/2)
+        return L2error(lambda x,y: self.uh(x,y),
+                     lambda x,y: self.u(x,y),0,self.length,0,self.length,n)
+        
+     
         
 class Helmotz(Poisson):
     
 
-    def __init__(self,c=lambda x,y: 4, nodal_value=12, length=100,
+    def __init__(self,c=lambda x,y: 1, nodal_value=12, length=100,
         dataframe_filename = 16,
-        f=lambda x,y: (2*np.pi**2/100**2+1)*np.sin(x*np.pi/100)*np.sin(y*np.pi/100)
+        f=lambda x,y: (2*np.pi**2/100**2+1)*np.sin(x*np.pi/100)*np.sin(y*np.pi/100),
+        u=lambda x,y: np.sin(x*np.pi/100)*np.sin(y*np.pi/100)
         ):
-        super().__init__(nodal_value, length, dataframe_filename,f)
+        super().__init__(nodal_value, length, dataframe_filename,f,u)
         self.c = c
         self.integrand_bilinear_form = lambda x,y,i,j: (
         self.phi_x(x, y, i) * self.phi_x(x, y, j) 
