@@ -1,6 +1,6 @@
 This acted as sort of constructor for the S21(a) and S111(a,b) orbits in 
-data files 46.csv and 48.csv. It has also been used the relevant command 
-to change all occurences at once.
+data files 46.csv and 16.csv. It has also been used the relevant 
+keyboard command to change all occurences at once.
 The data set comes from:
 
 A SET OF SYMMETRIC QUADRATURE RULES
