@@ -45,7 +45,7 @@ def test_stiffness_matrix(n, A):
     P=Poisson(n)
     P._A()
     Aapprox=P.A
-    npt.assert_almost_equal(Aapprox, A, decimal=0)
+    npt.assert_almost_equal(Aapprox, A, decimal=15)
 
 @pytest.mark.parametrize("f,length,n,boundary_value",[
     (lambda x,y: np.sin(x+y),100,5,np.zeros(100)),
