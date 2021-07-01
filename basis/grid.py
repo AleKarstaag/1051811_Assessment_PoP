@@ -1,50 +1,104 @@
-import numpy as np 
+"""Poisson-Helmotz 2D with Dirichlet BCs on square domain.
+
+The script contains three classes for solving the 2D Poisson
+and Helmotz equations with Dirichlet BCs on a square domain with arbitrary
+location on the cartesian plane.
+Examples on how to properly run the classes on
+a python interpreter could be found on the report or on the test files.
+"""
+import numpy as np
 from basis.Dirichlet import nodal_basis, nodal_basis_x, nodal_basis_y
 from basis.quadrature import triangle_quadrature_rule as quad, L2error
 from scipy import linalg
 from tqdm import trange
 import pandas as pd
 
+
 class Elliptic:
+    """Initialise data for solving an Elliptic PDE in a 2D square domain.
 
+    Contains information about the domain and the cells that will
+    be used in the finite element approximation of the domain.
 
-    def __init__(self, nodal_value=12, length=100, origin=[0,0]):
-        # Number of desiderd nodes = (nodal_value-2)^2
-        if not isinstance(nodal_value, int) and nodal_value<=2:
-            raise TypeError(f"{n} is not an integer greater then 2")
+    Parameteres
+    ----------
+    nodal_value : integer
+        The desired number of nodes in the first row of nodes;
+        the total number of interior nodes would be (nodal_value - 2)^2
+    length : float
+        The desired lenght of the side of square domain.
+    origin : 2-sized list
+        The desired point from where the square-domain will start,
+        in other words the desired bottom left cartesian coordinates
+        of the desired square domain.
+    
+    Attributes
+    ----------
+    nodes : np.ndarray
+        Tall and skinny numpy array containing the cartesian coordinates of the
+        interior nodes. Ordered from left to right and from bottom to top.
+    h : float
+        Length of the diameter of the triangles of the finite
+        element approximation of the square-domain.
+    length : float
+        Length of the side of the square-domain
+    phi : function(x : float , y : float, k : integer) -> float
+        Piecewise linear function for finite element method imported and
+        readpated from Dirichlet.py in order to take as input the k-th interior
+        node.
+    phi_x : function(x : float , y : float, k : integer) -> float
+        Partial derivative w.r.t x of phi
+    phi_y : function(x : float , y : float, k : integer) -> float
+        Partial derivative w.r.t y of phi
+    data16 : pd.core.frame.DataFrame
+        Used to get quadrature rule over triangular domain using 16 weights.
+    data46 : pd.core.frame.DataFrame
+        Used to get quadrature rule over triangular domain using 46 weights.
+    domain : list( float, float, float, float )
+        Contains information descibing the location of the square-domain.
+
+    """
+
+    def __init__(self, nodal_value=12, length=100, origin=[0, 0]):
         xd, yd = np.meshgrid(
-            np.linspace(origin[0], length+origin[0], nodal_value), np.linspace(origin[1], length+origin[1], nodal_value))
+            np.linspace(origin[0], length+origin[0], nodal_value),
+            np.linspace(origin[1], length+origin[1], nodal_value))
         self.nodes = np.transpose(
             (np.concatenate(xd[1:-1, 1:-1]), np.concatenate(yd[1:-1, 1:-1])))
-        self.h = xd[0,1]-xd[0,0]
-        self.length=length
+        self.h = xd[0, 1]-xd[0, 0]
+        self.length = length
         self.phi = lambda x, y, k: nodal_basis(x, y, self.nodes[k], self.h)
         self.phi_x = lambda x, y, k: nodal_basis_x(x, y, self.nodes[k], self.h)
         self.phi_y = lambda x, y, k: nodal_basis_y(x, y, self.nodes[k], self.h)
-        self.A = "Need to run the _A() method to get numerical value."
-        self.b = "Need to run the _L() method to get numerical value."
-        self.alpha = "Need to run the _U() method to get numerical value."
-        self.L2error= "Need to run the _L2error() method to get numerical value."
-        self.data16=pd.read_csv(f"data/{16}.csv")
-        self.data46=pd.read_csv(f"data/{46}.csv")
-        self.domain=[origin[0], length+origin[0],origin[1], length+origin[1]]
+        self.data16 = pd.read_csv("data/16.csv")
+        self.data46 = pd.read_csv("data/46.csv")
+        self.domain = [origin[0], length+origin[0],
+                       origin[1], length+origin[1]]
     
     def __repr__(self):
         return self.__class__.__name__ + " with x in " + repr(
-            self.domain[0])+ " , " + " y in "+repr(
-            self.domain[1])+ " and " + repr(len(self.nodes)) + " cells "
+            self.domain[0]) + " , " + " y in "+repr(
+            self.domain[1]) + " and " + repr(len(self.nodes)) + " cells "
 
-    def isonthe(self,i,j,tol=1e-10):
-        if abs(self.nodes[i][0]-self.nodes[j][0]-self.h)<=tol and self.nodes[i][1]==self.nodes[j][1]:
-            return 'Right'
-        elif abs(self.nodes[i][0]-self.nodes[j][0]+self.h)<=tol and self.nodes[i][1]==self.nodes[j][1]:
-            return 'Left'
-        elif self.nodes[i][0]==self.nodes[j][0] and abs(self.nodes[i][1]-self.nodes[j][1]-self.h)<=tol:
-            return 'Top'
-        elif self.nodes[i][0]==self.nodes[j][0] and abs(self.nodes[i][1]-self.nodes[j][1]+self.h)<=tol:
-            return 'Low'
-        elif self.nodes[i][0]==self.nodes[j][0] and self.nodes[i][1]==self.nodes[j][1]:
-            return 'Same'
+    def isonthe(self, i, j, tol=1e-10):
+        """Returns a string saying where the i-th interior node is with
+        respect to the j-th one."""
+        if self.nodes[i][1] == self.nodes[j][1]:
+            if abs(self.nodes[i][0]-self.nodes[j][0]-self.h) <= tol:
+                return 'Right'
+            elif abs(self.nodes[i][0]-self.nodes[j][0]+self.h) <= tol:
+                return 'Left'
+            elif self.nodes[i][0] == self.nodes[j][0]:
+                return 'Same'
+            else:
+                return 'None'
+        elif self.nodes[i][0] == self.nodes[j][0]:
+            if abs(self.nodes[i][1]-self.nodes[j][1]-self.h) <= tol:
+                return 'Top'
+            elif abs(self.nodes[i][1]-self.nodes[j][1]+self.h) <= tol:
+                return 'Low'
+            else:
+                return 'None'
         else:
             return 'None'
 
@@ -57,6 +111,10 @@ class Poisson(Elliptic):
                 u=lambda x,y: np.sin(x*np.pi/100) * np.sin(y*np.pi/100)
                 ):
         super().__init__(nodal_value, length, origin)
+        self.A = "Need to run the _A() method to get numerical value."
+        self.b = "Need to run the _L() method to get numerical value."
+        self.alpha = "Need to run the _U() method to get numerical value."
+        self.L2error= "Need to run the _L2error() method to get numerical value."
         self.integrand_bilinear_form = lambda x, y, i, j:(
             self.phi_x(x,y,i) * self.phi_x(x,y,j) 
             + self.phi_y(x,y,i) * self.phi_y(x,y,j))
