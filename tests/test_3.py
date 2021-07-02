@@ -2,7 +2,7 @@ from unicodedata import decimal
 import pytest
 import numpy as np
 import numpy.testing as npt
-"""Test Galerkin approximation of solution of the Poisson equation."""
+"""Test Galerkin approximation of the Poisson equation."""
 
 @pytest.mark.parametrize("cells_value, length, origin,f,u",[
     (5,100,[0,0],
@@ -16,6 +16,8 @@ import numpy.testing as npt
     (5,2,[-1,-1],
     lambda x,y: -(2*np.exp(x**2)+4*np.exp(x**2)*x**2)*(y**2-1)-2*(np.exp(x**2)-np.e),
     lambda x,y: (np.exp(x**2)-np.e)*(y**2-1))
+
+    
 
 ])
 

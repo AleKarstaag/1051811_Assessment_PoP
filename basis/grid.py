@@ -253,12 +253,12 @@ class Helmotz(Poisson):
         origin= [0,0],
         f=lambda x,y: 200*(x+y)-2*(x**2+y**2)+(x**2-100*x)*(y**2-100*y),
         u=lambda x,y: (x**2-100*x)*(y**2-100*y),
-        c=lambda x,y: 1):
+        c=1):
         super().__init__(nodal_value, length, origin, f, u)
-        self.c = lambda x,y : c(x,y)
+        self.c = c
         self.integrand_bilinear_form = lambda x,y,i,j: (
         self.phi_x(x, y, i) * self.phi_x(x, y, j) 
         + self.phi_y(x, y, i) * self.phi_y(x, y, j) 
-        + self.phi(x, y, i) * self.phi(x, y, j) * self.c(x, y))
+        + self.phi(x, y, i) * self.phi(x, y, j) * self.c)
     
 
