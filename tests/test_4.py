@@ -9,9 +9,15 @@ import numpy.testing as npt
     lambda x,y: (2*np.pi**2/(100**2)+1) * np.sin(x*np.pi/100)*np.sin(y*np.pi/100),
     lambda x,y: np.sin(x*np.pi/100) * np.sin(y*np.pi/100)),
 
-    (5,100,[0,0],
-    lambda x,y: -2*(y**2-100*y)-2*(x**2-100*x)+(x**2-100*x)*(y**2-100*y),
-    lambda x,y: (x**2-100*x)*(y**2-100*y))
+    (5,4,[-2,-2],
+    lambda x,y: -2*(y**2-4)-2*(x**2-4)+(x**2-4)*(y**2-4),
+    lambda x,y: (x**2-4)*(y**2-4)),
+
+    (5,2,[-1,-1],
+    lambda x,y: -(2*np.exp(x**2)+4*np.exp(x**2)*x**2)*(y**2-1)
+                -2*(np.exp(x**2)-np.e)
+                +(np.exp(x**2)-np.e)*(y**2-1),
+    lambda x,y: (np.exp(x**2)-np.e)*(y**2-1))
     # (5,4,[-2,-2],
     # lambda x,y: -2*(y**2-4)-2*(x**2-4),
     # lambda x,y: (x**2-4)*(y**2-4)),
