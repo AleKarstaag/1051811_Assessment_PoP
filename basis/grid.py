@@ -99,8 +99,13 @@ class Elliptic:
                 return 'Low'
             else:
                 return 'None'
+        
+        elif abs(self.nodes[i][1]-self.nodes[j][1]-self.h)<= tol and abs(self.nodes[i][0]-self.nodes[j][0]+self.h) <= tol:
+                return 'TopLeft'
+        elif abs(self.nodes[i][1]-self.nodes[j][1]+self.h) <= tol and abs(self.nodes[i][0]-self.nodes[j][0]-self.h) <= tol:
+                return 'LowRight'
         else:
-            return 'None'
+                return 'None'
 
 class Poisson(Elliptic):
 
@@ -251,8 +256,9 @@ class Helmotz(Poisson):
         nodal_value=12, 
         length=100, 
         origin= [0,0],
-        f=lambda x,y: 200*(x+y)-2*(x**2+y**2)+(x**2-100*x)*(y**2-100*y),
-        u=lambda x,y: (x**2-100*x)*(y**2-100*y),
+        f=lambda x,y: 
+                (2*np.pi**2/(100**2)+1) * np.sin(x*np.pi/100) * np.sin(y*np.pi/100),
+        u=lambda x,y: np.sin(x*np.pi/100) * np.sin(y*np.pi/100),
         c=1):
         super().__init__(nodal_value, length, origin, f, u)
         self.c = c
@@ -260,5 +266,70 @@ class Helmotz(Poisson):
         self.phi_x(x, y, i) * self.phi_x(x, y, j) 
         + self.phi_y(x, y, i) * self.phi_y(x, y, j) 
         + self.phi(x, y, i) * self.phi(x, y, j) * self.c)
+
+    def _a(self,i,j):
+        """Approximate the bilinear form only on the correspoding support."""
+        integrand=lambda x: self.integrand_bilinear_form(x[0],x[1],i,j)
+        h_shift=np.array([self.h,0])
+        v_shift=np.array([0,self.h])
+        if self.isonthe(i,j)=='Right':
+            I=0
+            I+=quad(self.data16,integrand,
+                self.nodes[i],self.nodes[j],self.nodes[j]+v_shift,self.h)
+            I+=quad(self.data16,integrand,
+                self.nodes[i],self.nodes[j],self.nodes[i]-v_shift,self.h)
+            return I
+        elif self.isonthe(i,j)=='Left':
+            I=0 
+            I+=quad(self.data16,integrand,
+                self.nodes[i],self.nodes[j],self.nodes[i]+v_shift,self.h)
+            I+=quad(self.data16,integrand,
+                self.nodes[i],self.nodes[j],self.nodes[j]-v_shift,self.h)
+            return I
+        elif self.isonthe(i,j)== 'Top':
+            I=0 
+            I+=quad(self.data16,integrand,
+                self.nodes[i],self.nodes[j],self.nodes[i]-h_shift,self.h)
+            I+=quad(self.data16,integrand,
+                self.nodes[i],self.nodes[j],self.nodes[j]+h_shift,self.h)
+            return I
+        elif self.isonthe(i,j)=='Low':
+            I=0 
+            I+=quad(self.data16,integrand,
+                self.nodes[i],self.nodes[j],self.nodes[j]-h_shift,self.h)
+            I+=quad(self.data16,integrand,
+                self.nodes[i],self.nodes[j],self.nodes[i]+h_shift,self.h)
+            return I
+        elif self.isonthe(i,j)=='TopLeft':
+            I=0
+            I+=quad(self.data16,integrand,
+                self.nodes[i],self.nodes[j],self.nodes[i]+h_shift,self.h)
+            I+= quad(self.data16,integrand,
+                self.nodes[i],self.nodes[j],self.nodes[j]-h_shift,self.h)
+            return I
+        elif self.isonthe(i,j)=='LowRight':
+            I=0
+            I+=quad(self.data16,integrand,
+                self.nodes[i],self.nodes[j],self.nodes[i]+v_shift,self.h)
+            I+=quad(self.data16,integrand,
+                self.nodes[i],self.nodes[j],self.nodes[j]-v_shift,self.h)
+            return I
+        elif self.isonthe(i,j)=='Same':
+            I=0
+            I+=quad(self.data16,integrand,# 1
+                self.nodes[i],self.nodes[i]+h_shift,self.nodes[i]+v_shift,self.h)
+            I+=quad(self.data16,integrand,# 2
+                self.nodes[i],self.nodes[i]+v_shift,self.nodes[i]+v_shift-h_shift,self.h)
+            I+=quad(self.data16,integrand,# 3
+                self.nodes[i],self.nodes[i]+v_shift-h_shift,self.nodes[i]-h_shift,self.h)
+            I+=quad(self.data16,integrand,# 4
+                self.nodes[i],self.nodes[i]-h_shift,self.nodes[i]-v_shift,self.h)
+            I+=quad(self.data16,integrand,# 5
+                self.nodes[i],self.nodes[i]-v_shift,self.nodes[i]-v_shift+h_shift,self.h)
+            I+=quad(self.data16,integrand,# 6
+                self.nodes[i],self.nodes[i]-v_shift+h_shift,self.nodes[i]+h_shift,self.h)
+            return I
+        else:
+            return 0
     
 
