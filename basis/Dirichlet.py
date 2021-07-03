@@ -1,6 +1,6 @@
 
 def nodal_basis(x,y,nodal_point,h):
-    """Finite basis function."""
+    """Piecewise linear basis function."""
     x_i=nodal_point[0]
     y_j=nodal_point[1]
     if (y-y_j)>=0 and (x-x_i)>=0 and (y-y_j) <= -(x-x_i)+h: #1

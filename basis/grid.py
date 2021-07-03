@@ -35,25 +35,21 @@ class Elliptic:
     Attributes
     ----------
     nodes : np.ndarray
-        Tall and skinny numpy array containing the cartesian coordinates of the
-        interior nodes. Ordered from left to right and from bottom to top.
+        Cartesian coordinates of the interior nodes.
     h : float
-        Length of the diameter of the triangles of the finite
-        element approximation of the square-domain.
+        Diameter 
     length : float
         Length of the side of the square-domain
     phi : function(x : float , y : float, k : integer) -> float
-        Piecewise linear function for finite element method imported and
-        readpated from Dirichlet.py in order to take as input the k-th interior
-        node.
+        Piecewise linear function of the finite element method
     phi_x : function(x : float , y : float, k : integer) -> float
         Partial derivative w.r.t x of phi
     phi_y : function(x : float , y : float, k : integer) -> float
         Partial derivative w.r.t y of phi
     data16 : pd.core.frame.DataFrame
-        Used to get quadrature rule over triangular domain using 16 weights.
+        Barycentric coordinates and weights for 16 points trinagular quadrature
     data46 : pd.core.frame.DataFrame
-        Used to get quadrature rule over triangular domain using 46 weights.
+        Barycentric coordinates and weights for 46 points trinagular quadrature
     domain : list( float, float, float, float )
         Contains information descibing the location of the square-domain.
 
@@ -83,6 +79,11 @@ class Elliptic:
     def isonthe(self, i, j, tol=1e-10):
         """Returns a string saying where the i-th interior node is with
         respect to the j-th one."""
+        
+        if not -len(self.nodes) < i < len(self.nodes):
+            raise ValueError(f"{i} is not between {-len(self.nodes)} and {len(self.nodes)}")
+        if not -len(self.nodes) < j < len(self.nodes):
+            raise ValueError(f"{j} is not between {-len(self.nodes)} and {len(self.nodes)}")
         if self.nodes[i][1] == self.nodes[j][1]:
             if abs(self.nodes[i][0]-self.nodes[j][0]-self.h) <= tol:
                 return 'Right'
@@ -99,7 +100,6 @@ class Elliptic:
                 return 'Low'
             else:
                 return 'None'
-        
         elif abs(self.nodes[i][1]-self.nodes[j][1]-self.h)<= tol and abs(self.nodes[i][0]-self.nodes[j][0]+self.h) <= tol:
                 return 'TopLeft'
         elif abs(self.nodes[i][1]-self.nodes[j][1]+self.h) <= tol and abs(self.nodes[i][0]-self.nodes[j][0]-self.h) <= tol:
