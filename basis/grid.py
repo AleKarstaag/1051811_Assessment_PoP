@@ -118,7 +118,7 @@ class Poisson(Elliptic):
         super().__init__(nodal_value, length, origin)
         self.A = "Need to run the _A() method to get numerical value."
         self.b = "Need to run the _L() method to get numerical value."
-        self.alpha = "Need to run the _U() method to get numerical value."
+        self.U = "Need to run the _U() method to get numerical value."
         self.L2error= "Need to run the _L2error() method to get numerical value."
         self.integrand_bilinear_form = lambda x, y, i, j:(
             self.phi_x(x,y,i) * self.phi_x(x,y,j) 
@@ -218,7 +218,7 @@ class Poisson(Elliptic):
                 self.A[i,j]=self._a(i,j)
         return "Done!"
     
-    def _alpha(self):
+    def _U(self):
         """Store as an attribute the alpha vector of coefficients."""
         if isinstance(self.A,str) or isinstance(self.b,str):
             self.A=np.zeros((len(self.nodes),len(self.nodes)))
@@ -228,26 +228,27 @@ class Poisson(Elliptic):
                 for j in range(len(self.nodes)):
                     self.A[i,j]=self._a(i,j)
         
-        self.alpha=linalg.solve(self.A,self.b)
+        self.U=linalg.solve(self.A,self.b)
         return 'Done!'
     
     def uh(self,x,y): 
         """Approximated solution evaluated at cartesian coordinates (x,y)."""
-        if isinstance(self.alpha,str):
-            self._alpha()
+        if isinstance(self.U,str):
+            self._U()
         res=0
         for i in range(len(self.nodes)):
-            res+=self.alpha[i]*self.phi(x,y,i)
+            res+=self.U[i]*self.phi(x,y,i)
         return res
     
-    def error(self,GLdegree=7):
-        if isinstance(self.L2error,str):
-            self.uh(self.length/2,self.length/2)
-        self.L2error=L2error(lambda x,y: self.uh(x,y),
-            lambda x,y: self.u(x,y),
-            self.domain[0],self.domain[1],self.domain[2],self.domain[3],
-            GLdegree)
-        return self.L2error
+    def error(self,GLdegree=7,norm='L2norm'):
+        if norm=='L2norm':
+            if isinstance(self.L2error,str):
+                self.uh(self.length/2,self.length/2)
+            self.L2error=L2error(lambda x,y: self.uh(x,y),
+                lambda x,y: self.u(x,y),
+                self.domain[0],self.domain[1],self.domain[2],self.domain[3],
+                GLdegree)
+            return self.L2error
           
 class Helmotz(Poisson):
     
