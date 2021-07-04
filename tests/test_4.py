@@ -36,6 +36,6 @@ def test_L2norm(cells_value, length, origin, f, u):
     error_new_new=H_new_new.error()
     npt.assert_equal( (1/2)*H.h, H_new.h )
     npt.assert_almost_equal( (1/2)*H_new.h,H_new_new.h,decimal=15)
-    npt.assert_almost_equal((1/5)*error, error_new, decimal=1) 
-    npt.assert_almost_equal((1/5)*error_new, error_new_new, decimal=1)
+    npt.assert_almost_equal((1/6)*error, error_new, decimal=1) 
+    npt.assert_almost_equal((1/6)*error_new, error_new_new, decimal=1)
     
