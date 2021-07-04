@@ -22,8 +22,7 @@ def triangle_quadrature_rule(dataframe, function,
 
 
 def GaussLegendre(f, a, b, c, d, n):
-    """Approximate the double-integral of the function f over the square or rectangular
-       described by a<x<b and c<y<d. The degree of the Legendre polynomial is given by n.
+    """Tensor product version of 1D Gauss-Legendre quadrature rule.
        """
     [xi, w] = p_roots(n+1)
     x = 1/2*(1-xi)*a+1/2*(1+xi)*b
