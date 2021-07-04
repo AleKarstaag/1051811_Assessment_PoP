@@ -24,15 +24,15 @@ import numpy.testing as npt
 def test_L2norm_Helmholtz(cells_value, length, origin, f, u):
     from basis import Poisson
     P=Poisson(cells_value, length, origin, f, u)
-    cells_value_new=(cells_value-2)*2+3 
-    cells_value_new_new=(cells_value_new-2)*2+3
-    P_new=Poisson(cells_value_new,length,origin,f,u)
-    P_new_new=Poisson(cells_value_new_new,length,origin,f,u)
-    error=P.error()
-    error_new=P_new.error()
-    error_new_new=P_new_new.error()
-    npt.assert_equal( (1/2)*P.h, P_new.h )
-    npt.assert_equal( (1/2)*P_new.h,P_new_new.h)
-    npt.assert_almost_equal((1/4)*error, error_new, decimal=1)
-    npt.assert_almost_equal((1/4)*error_new, error_new_new, decimal=1)
+    cells_value2=(cells_value-2)*2+3 
+    cells_value3=(cells_value2-2)*2+3
+    P2=Poisson(cells_value2,length,origin,f,u)
+    P3=Poisson(cells_value3,length,origin,f,u)
+    e1=P.error()
+    e2=P2.error()
+    e3=P3.error()
+    npt.assert_equal( (1/2)*P.h, P2.h )
+    npt.assert_equal( (1/2)*P2.h,P3.h)
+    assert e2 <= (1/4)*e1 or abs(e2-(1/4)*e1)<=1e-1
+    assert e3 <= (1/4)*e2 or abs(e3-(1/4)*e2)<=2e-1
     

@@ -9,7 +9,7 @@ import numpy.testing as npt
     lambda x,y: (2*np.pi**2/(100**2)+1) * np.sin(x*np.pi/100)*np.sin(y*np.pi/100),
     lambda x,y: np.sin(x*np.pi/100) * np.sin(y*np.pi/100)),
 
-    (7,4,[-2,-2],
+    (5,4,[-2,-2],
     lambda x,y: -2*(y**2-4)-2*(x**2-4)+(x**2-4)*(y**2-4),
     lambda x,y: (x**2-4)*(y**2-4)),
 
@@ -26,16 +26,16 @@ import numpy.testing as npt
 
 def test_L2norm_Helmholtz(cells_value, length, origin, f, u):
     from basis import Helmholtz 
-    H=Helmholtz (cells_value, length, origin, f, u)
-    cells_value_new=2*cells_value-1 
-    cells_value_new_new=2*cells_value_new-1
-    H_new=Helmholtz (cells_value_new,length,origin,f,u)
-    H_new_new=Helmholtz (cells_value_new_new,length,origin,f,u)
-    error=H.error()
-    error_new=H_new.error()
-    error_new_new=H_new_new.error()
-    npt.assert_equal( (1/2)*H.h, H_new.h )
-    npt.assert_almost_equal( (1/2)*H_new.h,H_new_new.h,decimal=15)
-    npt.assert_almost_equal((1/6)*error, error_new, decimal=1) 
-    npt.assert_almost_equal((1/6)*error_new, error_new_new, decimal=1)
+    H=Helmholtz(cells_value, length, origin, f, u)
+    cells_value2=(cells_value-2)*2+3 
+    cells_value3=(cells_value2-2)*2+3
+    H2=Helmholtz(cells_value2,length,origin,f,u)
+    H3=Helmholtz(cells_value3,length,origin,f,u)
+    e1=H.error()
+    e2=H2.error()
+    e3=H3.error()
+    npt.assert_equal( (1/2)*H.h, H2.h )
+    npt.assert_equal( (1/2)*H2.h,H3.h)
+    assert e2 <= (1/4)*e1 or abs(e2-(1/4)*e1)<=1e-1
+    assert e3 <= (1/4)*e2 or abs(e3-(1/4)*e2)<=2e-1
     
