@@ -250,7 +250,7 @@ class Poisson(Elliptic):
                 GLdegree)
             return self.L2error
           
-class Helmotz(Poisson):
+class Helmholtz (Poisson):
     
 
     def __init__(self,
@@ -275,59 +275,59 @@ class Helmotz(Poisson):
         v_shift=np.array([0,self.h])
         if self.isonthe(i,j)=='Right':
             I=0
-            I+=quad(self.data16,integrand,
+            I+=quad(self.data46,integrand,
                 self.nodes[i],self.nodes[j],self.nodes[j]+v_shift,self.h)
-            I+=quad(self.data16,integrand,
+            I+=quad(self.data46,integrand,
                 self.nodes[i],self.nodes[j],self.nodes[i]-v_shift,self.h)
             return I
         elif self.isonthe(i,j)=='Left':
             I=0 
-            I+=quad(self.data16,integrand,
+            I+=quad(self.data46,integrand,
                 self.nodes[i],self.nodes[j],self.nodes[i]+v_shift,self.h)
-            I+=quad(self.data16,integrand,
+            I+=quad(self.data46,integrand,
                 self.nodes[i],self.nodes[j],self.nodes[j]-v_shift,self.h)
             return I
         elif self.isonthe(i,j)== 'Top':
             I=0 
-            I+=quad(self.data16,integrand,
+            I+=quad(self.data46,integrand,
                 self.nodes[i],self.nodes[j],self.nodes[i]-h_shift,self.h)
-            I+=quad(self.data16,integrand,
+            I+=quad(self.data46,integrand,
                 self.nodes[i],self.nodes[j],self.nodes[j]+h_shift,self.h)
             return I
         elif self.isonthe(i,j)=='Low':
             I=0 
-            I+=quad(self.data16,integrand,
+            I+=quad(self.data46,integrand,
                 self.nodes[i],self.nodes[j],self.nodes[j]-h_shift,self.h)
-            I+=quad(self.data16,integrand,
+            I+=quad(self.data46,integrand,
                 self.nodes[i],self.nodes[j],self.nodes[i]+h_shift,self.h)
             return I
         elif self.isonthe(i,j)=='TopLeft':
             I=0
-            I+=quad(self.data16,integrand,
+            I+=quad(self.data46,integrand,
                 self.nodes[i],self.nodes[j],self.nodes[i]+h_shift,self.h)
-            I+= quad(self.data16,integrand,
+            I+= quad(self.data46,integrand,
                 self.nodes[i],self.nodes[j],self.nodes[j]-h_shift,self.h)
             return I
         elif self.isonthe(i,j)=='LowRight':
             I=0
-            I+=quad(self.data16,integrand,
+            I+=quad(self.data46,integrand,
                 self.nodes[i],self.nodes[j],self.nodes[i]+v_shift,self.h)
-            I+=quad(self.data16,integrand,
+            I+=quad(self.data46,integrand,
                 self.nodes[i],self.nodes[j],self.nodes[j]-v_shift,self.h)
             return I
         elif self.isonthe(i,j)=='Same':
             I=0
-            I+=quad(self.data16,integrand,# 1
+            I+=quad(self.data46,integrand,# 1
                 self.nodes[i],self.nodes[i]+h_shift,self.nodes[i]+v_shift,self.h)
-            I+=quad(self.data16,integrand,# 2
+            I+=quad(self.data46,integrand,# 2
                 self.nodes[i],self.nodes[i]+v_shift,self.nodes[i]+v_shift-h_shift,self.h)
-            I+=quad(self.data16,integrand,# 3
+            I+=quad(self.data46,integrand,# 3
                 self.nodes[i],self.nodes[i]+v_shift-h_shift,self.nodes[i]-h_shift,self.h)
-            I+=quad(self.data16,integrand,# 4
+            I+=quad(self.data46,integrand,# 4
                 self.nodes[i],self.nodes[i]-h_shift,self.nodes[i]-v_shift,self.h)
-            I+=quad(self.data16,integrand,# 5
+            I+=quad(self.data46,integrand,# 5
                 self.nodes[i],self.nodes[i]-v_shift,self.nodes[i]-v_shift+h_shift,self.h)
-            I+=quad(self.data16,integrand,# 6
+            I+=quad(self.data46,integrand,# 6
                 self.nodes[i],self.nodes[i]-v_shift+h_shift,self.nodes[i]+h_shift,self.h)
             return I
         else:
