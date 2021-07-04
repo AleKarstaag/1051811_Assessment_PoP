@@ -21,7 +21,7 @@ import numpy.testing as npt
 
 ])
 
-def test_L2norm(cells_value, length, origin, f, u):
+def test_L2norm_Helmholtz(cells_value, length, origin, f, u):
     from basis import Poisson
     P=Poisson(cells_value, length, origin, f, u)
     cells_value_new=(cells_value-2)*2+3 

@@ -24,11 +24,11 @@ import numpy.testing as npt
 
 ])
 
-def test_L2norm(cells_value, length, origin, f, u):
+def test_L2norm_Helmholtz(cells_value, length, origin, f, u):
     from basis import Helmholtz 
     H=Helmholtz (cells_value, length, origin, f, u)
-    cells_value_new=(cells_value-2)*2+3 
-    cells_value_new_new=(cells_value_new-2)*2+3
+    cells_value_new=2*cells_value-1 
+    cells_value_new_new=2*cells_value_new-1
     H_new=Helmholtz (cells_value_new,length,origin,f,u)
     H_new_new=Helmholtz (cells_value_new_new,length,origin,f,u)
     error=H.error()
