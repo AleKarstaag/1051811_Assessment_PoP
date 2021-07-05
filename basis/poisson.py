@@ -83,7 +83,7 @@ class Poisson(Elliptic):
         self.A = "Need to run the _A() method."
         self.b = "Need to run the _L() method."
         self.U = "Need to run the _U() method."
-        self.L2error = "Need to run the _L2error() method."
+        self.L2error = "Need to run the error() method."
         self.integrand_bilinear_form = lambda x, y, i, j: (
             self.phi_x(x, y, i) * self.phi_x(x, y, j)
             + self.phi_y(x, y, i) * self.phi_y(x, y, j))
@@ -241,4 +241,3 @@ class Poisson(Elliptic):
                                    self.domain[1], self.domain[2],
                                    self.domain[3], GLdegree)
             return self.L2error
-            
