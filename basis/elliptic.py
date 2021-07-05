@@ -5,7 +5,7 @@ elliptic PDE solver on a 2D square domain with
 Dirichlet boundaries conditions .
 """
 import numpy as np
-from basis.Dirichlet import nodal_basis, nodal_basis_x, nodal_basis_y
+from basis.dirichlet import nodal_basis, nodal_basis_x, nodal_basis_y
 import pandas as pd
 
 

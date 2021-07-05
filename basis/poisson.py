@@ -12,6 +12,7 @@ from scipy import linalg
 from tqdm import trange
 from basis.elliptic import Elliptic
 
+
 class Poisson(Elliptic):
     """Subclass of Elliptic for solving Poisson equation.
 
@@ -240,3 +241,4 @@ class Poisson(Elliptic):
                                    self.domain[1], self.domain[2],
                                    self.domain[3], GLdegree)
             return self.L2error
+            

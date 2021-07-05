@@ -11,7 +11,6 @@ from basis.quadrature import triangle_quadrature_rule as quad
 from basis.poisson import Poisson
 
         
-
 class Helmholtz (Poisson):
     """Helmholt subclass of Poisson for solving Helmholtz equation.
 
